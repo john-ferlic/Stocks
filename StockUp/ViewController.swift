@@ -16,7 +16,7 @@ class ViewController: UIViewController {
     
     @IBAction func buttonPressed(_ sender: Any) {
         
-        if let url = URL(string: "https://www.quandl.com/api/v3/datasets/WIKI/\(self.tickerTextField.text!)/data.json?api_key=1vm2-SkboCgr-7pwGCfC&limit=1") {
+        if let url = URL(string: "https://www.quandl.com/api/v3/datasets/EOD/\(self.tickerTextField.text!)/data.json?api_key=1vm2-SkboCgr-7pwGCfC&limit=1") {
             URLSession.shared.dataTask(with: url) { (data, response, error) -> Void in
                 guard error == nil else {
                     print("Error: \(error!)")
