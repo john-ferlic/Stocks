@@ -7,14 +7,16 @@
 //
 
 import UIKit
+import Foundation
 
 class ViewController: UIViewController {
     
     var data: [Float] = []
+    var bkgrndColor: String = ""
     
     @IBAction func buttonPressed(_ sender: Any) {
         
-        if let url = URL(string: "https://www.quandl.com/api/v3/datasets/WIKI/\(self.tickerTextField.text!)/data.json?api_key=1vm2-SkboCgr-7pwGCfC") {
+        if let url = URL(string: "https://www.quandl.com/api/v3/datasets/WIKI/\(self.tickerTextField.text!)/data.json?api_key=1vm2-SkboCgr-7pwGCfC&limit=1") {
             URLSession.shared.dataTask(with: url) { (data, response, error) -> Void in
                 guard error == nil else {
                     print("Error: \(error!)")
@@ -29,6 +31,7 @@ class ViewController: UIViewController {
                     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                     print("Bad Response: \(response.statusCode)")
                     DispatchQueue.main.async {
+                        self.view.backgroundColor = UIColor.white
                         self.present(alert, animated: true)
                         self.tickerLabel.text = ""
                         self.openPriceLabel.text = ""
@@ -54,12 +57,22 @@ class ViewController: UIViewController {
                 
                 if let result = try? decoder.decode(TimeSeries.self, from: data) {
                     self.data = result.datasetData.data.first?.data ?? []
+                    if (self.data[0] > self.data[3]) {
+                        self.bkgrndColor = "red"
+                    } else {
+                        self.bkgrndColor = "green"
+                    }
                     print(result.datasetData.data.first?.date)
                     for x in self.data {
                         print(x)
                     }
                     
                     DispatchQueue.main.async {
+                        if (self.bkgrndColor == "red") {
+                            self.view.backgroundColor = UIColor.red
+                        } else {
+                            self.view.backgroundColor = UIColor.green
+                        }
                         self.tickerLabel.text = self.tickerTextField.text?.uppercased()
                         self.openPriceLabel.text = String(self.data[0])
                         self.closingPriceLabel.text = String(self.data[3])
