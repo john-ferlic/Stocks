@@ -14,7 +14,7 @@ class ViewController: UIViewController {
     
     @IBAction func buttonPressed(_ sender: Any) {
         
-        if let url = URL(string: "https://www.quandl.com/api/v3/datasets/WIKI/\(self.tickerTextField.text!)/data.json?api_key=1vm2-SkboCgr-7pwGCfC&limit=1") {
+        if let url = URL(string: "https://www.quandl.com/api/v3/datasets/WIKI/\(self.tickerTextField.text!)/data.json?api_key=1vm2-SkboCgr-7pwGCfC") {
             URLSession.shared.dataTask(with: url) { (data, response, error) -> Void in
                 guard error == nil else {
                     print("Error: \(error!)")
@@ -25,8 +25,11 @@ class ViewController: UIViewController {
                     return
                 }
                 guard response.statusCode == 200 else {
+                    let alert = UIAlertController(title: "No Results", message: "The ticker you entered didn't give any results", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                     print("Bad Response: \(response.statusCode)")
                     DispatchQueue.main.async {
+                        self.present(alert, animated: true)
                         self.tickerLabel.text = ""
                         self.openPriceLabel.text = ""
                         self.closingPriceLabel.text = ""
@@ -51,8 +54,13 @@ class ViewController: UIViewController {
                 
                 if let result = try? decoder.decode(TimeSeries.self, from: data) {
                     self.data = result.datasetData.data.first?.data ?? []
+                    print(result.datasetData.data.first?.date)
+                    for x in self.data {
+                        print(x)
+                    }
+                    
                     DispatchQueue.main.async {
-                        self.tickerLabel.text = self.tickerTextField.text
+                        self.tickerLabel.text = self.tickerTextField.text?.uppercased()
                         self.openPriceLabel.text = String(self.data[0])
                         self.closingPriceLabel.text = String(self.data[3])
                         self.tickerTextField.text = ""
